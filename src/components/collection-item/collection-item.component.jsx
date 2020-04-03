@@ -32,6 +32,4 @@ const mapDispatchToProps = dispatch => ({
   addItem: item => dispatch(addItem(item))
 });
 
-const mapStateToProps = { cart: { cartItems } };
-
 export default connect(null, mapDispatchToProps)(CollectionItem);
