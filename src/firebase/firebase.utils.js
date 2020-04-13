@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
-import { useRef } from "react";
 
 const config = {
   apiKey: "AIzaSyAwbl8gKYTZYBJl9WmDAxt6DqyOOuVaWck",
@@ -10,16 +9,21 @@ const config = {
   projectId: "shop-db-a5988",
   storageBucket: "shop-db-a5988.appspot.com",
   messagingSenderId: "904034726856",
-  appId: "1:904034726856:web:b30758d9682158b7d946fd"
+  appId: "1:904034726856:web:b30758d9682158b7d946fd",
 };
 
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
   const userRef = firestore.doc(`users/${userAuth.uid}`);
+  //const collectionRef = firestore.collection("users");
 
   const snapShot = await userRef.get();
-
+  //const collectionSnapshot = await collectionRef.get();
+  // console.log(
+  //   { collection: collectionSnapshot.docs.map((doc) => doc.data()) },
+  //   "SNAP"
+  // );
   if (!snapShot.exists) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
@@ -29,7 +33,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
         displayName,
         email,
         createdAt,
-        ...additionalData
+        ...additionalData,
       });
     } catch (error) {
       console.log("error creating user", error.message);
@@ -37,6 +41,21 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   }
 
   return userRef;
+};
+
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+
+  const batch = firestore.batch();
+  objectsToAdd.forEach((obj) => {
+    const newDocRef = collectionRef.doc();
+    batch.set(newDocRef, obj);
+  });
+
+  return await batch.commit();
 };
 
 firebase.initializeApp(config);
